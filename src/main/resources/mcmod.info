@@ -1,0 +1,16 @@
+[
+{
+  "modid": "wynnutilitymod",
+  "name": "Wynn Utility Mod",
+  "description": "esimod",
+  "version": "FT2",
+  "mcversion": "1.12.2",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Petrae"],
+  "credits": "xLela, for the idea; BoundlessSea, for improving it",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
