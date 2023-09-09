@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "wum",
+  "version": "${version}",
+  "name": "WynnUtilityMod",
+  "description": "",
+  "authors": [
+    "unrealintegers"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/WynnUtilityMod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "io.unrealintegers.wynnutilitymod.WynnUtilityMod"
+    ]
+  },
+  "mixins": [
+    "WynnUtilityMod.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.22",
+    "fabric-api": "*",
+    "minecraft": "1.20.1"
+  }
+}
