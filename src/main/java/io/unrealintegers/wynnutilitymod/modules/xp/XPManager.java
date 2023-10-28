@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -80,8 +80,8 @@ public class XPManager {
                             return 1;
                         })
         ));
-        HudRenderCallback.EVENT.register((mStack, tickDelta) -> {
-            WynnUtilityMod.getXpManager().render(mStack);
+        HudRenderCallback.EVENT.register((ctx, tickDelta) -> {
+            WynnUtilityMod.getXpManager().render(ctx);
         });
     }
 
@@ -111,26 +111,26 @@ public class XPManager {
         }
     }
 
-    void render(MatrixStack mStack) {
+    void render(DrawContext ctx) {
         if (!state || !visibility || !hasGuild) return;
-        
+
         int x = 2;
-        int y = MinecraftClient.getInstance().getWindow().getScaledHeight() / 2;
+        int y = ctx.getScaledWindowHeight() / 2;
 
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
 
         int ex = tr.fontHeight;
-        
-        tr.drawWithShadow(mStack, "Guild XP", x, y, Color.white.getRGB());
 
-        String xp1m = avg1m == null ? "  1m: ---" : String.format("  1m: %s/h", NumberFormatter.format(avg1m));
-        tr.drawWithShadow(mStack, xp1m, x, y + ex, Color.white.getRGB());
+        ctx.drawText(tr, "Guild XP", x, y, Color.white.getRGB(), true);
 
-        String xp5m = avg5m == null ? "  5m: ---" : String.format("  5m: %s/h", NumberFormatter.format(avg5m));
-        tr.drawWithShadow(mStack, xp5m, x, y + 2 * ex, Color.white.getRGB());
+        String xp1m = avg1m == null ? "  1m: ---" : String.format("1m: %s/h", NumberFormatter.format(avg1m));
+        ctx.drawText(tr, xp1m, x, y + ex, Color.white.getRGB(), true);
 
-        String xp15m = avg15m == null ? "  15m: ---" : String.format("  15m: %s/h", NumberFormatter.format(avg15m));
-        tr.drawWithShadow(mStack, xp15m, x, y + 3 * ex, Color.white.getRGB());
+        String xp5m = avg5m == null ? "  5m: ---" : String.format("5m: %s/h", NumberFormatter.format(avg5m));
+        ctx.drawText(tr, xp5m, x, y + 2 * ex, Color.white.getRGB(), true);
+
+        String xp15m = avg15m == null ? "  15m: ---" : String.format("15m: %s/h", NumberFormatter.format(avg15m));
+        ctx.drawText(tr, xp15m, x, y + 3 * ex, Color.white.getRGB(), true);
     }
 
     void updateXP(long xp) {
