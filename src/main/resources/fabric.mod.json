@@ -19,10 +19,9 @@
   "mixins": [
     "WynnUtilityMod.mixins.json"
   ],
-  "accessWidener": "WynnUtilityMod.accesswidener",
   "depends": {
     "fabricloader": ">=0.14.22",
     "fabric-api": "*",
-    "minecraft": "1.19.4"
+    "minecraft": "1.20.1"
   }
 }

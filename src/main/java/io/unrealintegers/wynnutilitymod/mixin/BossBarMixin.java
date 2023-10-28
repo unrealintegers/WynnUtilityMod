@@ -1,6 +1,5 @@
 package io.unrealintegers.wynnutilitymod.mixin;
 
-import io.unrealintegers.wynnutilitymod.WynnUtilityMod;
 import io.unrealintegers.wynnutilitymod.event.BossBarCallback;
 import net.minecraft.client.gui.hud.BossBarHud;
 import net.minecraft.network.packet.s2c.play.BossBarS2CPacket;
