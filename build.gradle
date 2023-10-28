@@ -63,6 +63,10 @@ jar {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/WynnUtilityMod.accesswidener")
+}
+
 // configure the maven publication
 publishing {
     publications {
