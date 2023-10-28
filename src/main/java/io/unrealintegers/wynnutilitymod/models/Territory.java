@@ -126,7 +126,11 @@ public class Territory implements Serializable {
                 break;
             }
         }
-        if (!it.hasNext()) return;
+        if (!it.hasNext()) {
+            // Treasury not found, set it to 0 and reset iterator
+            treasuryBonusPct = 0f;
+            it = lines.listIterator();
+        }
 
         while (it.hasNext() && !it.next().contains("Upgrades")) ; // Skip until we find the upgrades
         if (!it.hasNext()) return;  // If there is no upgrades
@@ -155,6 +159,8 @@ public class Territory implements Serializable {
 
         String description = display.getDescription().getString();
 
+        WynnUtilityMod.LOGGER.info(description);
+
         // Remove Formatting
         description = description.replaceAll("§[0-9a-f]", "");
         String[] lines = description.split("\n");
@@ -163,6 +169,8 @@ public class Territory implements Serializable {
         Matcher matcher = AdvancementPatterns.GUILD_PATTERN.matcher(lines[0]);
         if (matcher.find()) {
             this.owner = matcher.group("tag");
+        } else {
+            this.owner = "null";
         }
 
         // Line 2 -- I: Resources

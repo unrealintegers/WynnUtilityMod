@@ -6,11 +6,8 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.network.packet.s2c.play.BossBarS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +19,6 @@ public class BossBarListener {
                     "§4❤ (?<hp>\\d+)§7 \\(§6(?<def>[\\d.]+)%§7\\) - " +
                     "§c☠ (?<dmin>\\d+)-(?<dmax>\\d+)§7 \\(§b(?<as>[\\d.]+)x§7\\)"
     );
-    private static final Set<String> found = new HashSet<>();
 
     public BossBarListener() {
         BossBarCallback.EVENT.register(this::onBossBarPacket);
@@ -56,11 +52,8 @@ public class BossBarListener {
                         Text updatedText = processName(name);
                         if (updatedText == null) return;
 
-                        try {
-                            FieldUtils.writeField(FieldUtils.readField(packet, "action", true),
-                                    "name", updatedText, true);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
+                        if (packet.action instanceof BossBarS2CPacket.AddAction addAction) {
+                            addAction.name = updatedText;
                         }
                     }
 
@@ -69,11 +62,9 @@ public class BossBarListener {
                         Text updatedText = processName(name);
                         if (updatedText == null) return;
 
-                        try {
-                            FieldUtils.writeField(FieldUtils.readField(packet, "action", true),
-                                    "name", updatedText, true);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
+                        var action = packet.action;
+                        if (action instanceof BossBarS2CPacket.UpdateNameAction updateNameAction) {
+                            updateNameAction.name = updatedText;
                         }
                     }
                 }
