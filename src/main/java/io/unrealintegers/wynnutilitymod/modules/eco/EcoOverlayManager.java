@@ -18,14 +18,13 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EcoOverlayManager {
@@ -40,7 +39,7 @@ public class EcoOverlayManager {
             "  §r§6\u24b8: Wood",
             "  §r§b\u24c0: Fish",
             "  §r§e\u24bf: Crops",
-            "  §r§a\u2b1f: Oasis",
+            "  §r§d\u2b1f: Oasis",
             "  Size indicates production.",
             "§rDefenses (Bottom Right):",
             "  §r§b-: Very Low",
@@ -80,32 +79,20 @@ public class EcoOverlayManager {
     }
 
     public void preRender(DrawContext ctx, Screen screen) {
-        try {
-            Field field = Screen.class.getDeclaredField("title");
-            field.setAccessible(true);
-            field.set(screen, Text.literal(TITLES.get(currentMode)));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        screen.title = Text.literal(TITLES.get(currentMode));
     }
 
-    public void render(DrawContext ctx, Screen screen) {
+    public void render(DrawContext ctx, GenericContainerScreen screen) {
         if (lastRender.plusSeconds(1).isBefore(LocalDateTime.now())) {
             WynnUtilityMod.LOGGER.info("Opening territory GUI.");
             currentMode = EcoOverlayMode.NAME_DEF;
         }
         lastRender = LocalDateTime.now();
 
-        Inventory inv = ((GenericContainerScreen) screen).getScreenHandler().getInventory();
-        Integer sx, sy;
-        try {
-            sx = (Integer) FieldUtils.readField(screen, "x", true);
-            sy = (Integer) FieldUtils.readField(screen, "y", true);
 
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return;
-        }
+        Inventory inv = screen.getScreenHandler().getInventory();
+        int sx = screen.x;
+        int sy = screen.y;
 
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
@@ -115,7 +102,7 @@ public class EcoOverlayManager {
         renderLegend(ctx, sx, sy, tr);
 
         for (int i = 0; i < inv.size(); ++i) {
-            Slot slot = ((GenericContainerScreen) screen).getScreenHandler().getSlot(i);
+            Slot slot = screen.getScreenHandler().getSlot(i);
             ItemStack istack = inv.getStack(i);
             Item item = istack.getItem();
 
@@ -131,8 +118,9 @@ public class EcoOverlayManager {
             }
 
             String stripped = StringHelper.stripTextFormat(name).replaceAll(" *\\(HQ\\)", "").replaceAll("À", "").replaceAll("\\[!] ", "");
-            if (stripped.equals("Territory Loadouts")) {
-                return;
+            if (stripped.equals("Territory Loadouts") || stripped.equals("Back") ||
+                    stripped.equals("Previous Page") || stripped.equals("Next Page")) {
+                continue;
             }
 
             Territory terr = Wynncraft.getTerritory(stripped);
@@ -142,8 +130,7 @@ public class EcoOverlayManager {
 
                 if (terr.isHQ) {
                     ItemUtils.replaceItemInInventory(inv, i, DIAMOND);
-                }
-                else if (terr.isConnectedToHQ) {
+                } else if (terr.isConnectedToHQ) {
                     if (item == DIAMOND_AXE) {
                         ItemUtils.replaceItemInInventory(inv, i, GOLDEN_SHOVEL, 21);
                     } else {

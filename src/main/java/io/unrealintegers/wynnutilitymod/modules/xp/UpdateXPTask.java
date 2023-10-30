@@ -25,7 +25,8 @@ public class UpdateXPTask extends RecurringTask {
     public UpdateXPTask(XPManager xpManager) throws IOException, InterruptedException {
         super(INTERVAL, false);
 
-        UUID uuid = MinecraftClient.getInstance().getSession().getProfile().getId();
+        UUID uuid = MinecraftClient.getInstance().getSession().getUuidOrNull();
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.wynncraft.com/v2/player/" + uuid.toString() + "/stats"))
                 .build();
@@ -72,7 +73,7 @@ public class UpdateXPTask extends RecurringTask {
 
         for (JsonElement member : membersArray) {
             JsonObject memberObject = member.getAsJsonObject();
-            if (memberObject.get("name").getAsString().equals(MinecraftClient.getInstance().getSession().getProfile().getName())) {
+            if (memberObject.get("name").getAsString().equals(MinecraftClient.getInstance().getSession().getUsername())) {
                 long xp = memberObject.get("contributed").getAsLong();
                 xpManager.updateXP(xp);
                 return;
