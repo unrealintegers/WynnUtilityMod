@@ -1,16 +1,17 @@
 package io.unrealintegers.wynnutilitymod.models;
 
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
 
 public enum TerritoryProductionType {
-    ORE('\u24b7', new Color(0xaaaaaa)),
-    WOOD('\u24b8', new Color(0xffaa00)),
-    FISH('\u24c0', new Color(0x55ffff)),
-    CROPS('\u24bf', new Color(0xffff55)),
-    OASIS('\u2b1f', new Color(0xff55ff));
+    ORE('\u24b7', Formatting.GRAY),
+    WOOD('\u24b8', Formatting.GOLD),
+    FISH('\u24c0', Formatting.AQUA),
+    CROPS('\u24bf', Formatting.YELLOW),
+    OASIS('\u2b1f', Formatting.LIGHT_PURPLE);
 
     public static TerritoryProductionType fromResourceType(ResourceType resourceType) {
         try {
@@ -20,11 +21,15 @@ public enum TerritoryProductionType {
         }
     }
 
-    public final Character Symbol;
-    public final Color Color;
+    public final Character symbol;
+    private final Formatting format;
 
-    TerritoryProductionType(@Nullable Character symbol, Color color) {
-        this.Symbol = symbol;
-        this.Color = color;
+    TerritoryProductionType(@Nullable Character symbol, Formatting format) {
+        this.symbol = symbol;
+        this.format = format;
+    }
+
+    public String getFormat() {
+        return format.toString();
     }
 }

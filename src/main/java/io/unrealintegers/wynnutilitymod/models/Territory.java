@@ -48,7 +48,7 @@ public class Territory implements Serializable {
     private static class AdvancementPatterns {
         private static final Pattern GUILD_PATTERN = Pattern.compile("(?<name>[A-Za-z ]+) \\[(?<tag>[A-Za-z]{3,4})]");
         private static final List<Pattern> RESOURCE_PATTERNS = Stream.of(ResourceType.values()).map((TYPE) -> {
-            Character symbol = TYPE.Symbol;
+            Character symbol = TYPE.symbol;
             String prefix = (symbol == null) ? "" : symbol + " ";
             Pattern generationPattern = Pattern.compile(prefix + "\\+(?<generated>\\d+) \\w+ per Hour",
                     Pattern.CASE_INSENSITIVE);
@@ -66,10 +66,10 @@ public class Territory implements Serializable {
 
     private final String name;
     public boolean isHQ;
-    public boolean isConnectedToHQ = true;
+    public int distanceToHQ = -1;
     private String owner;
 
-    private Float treasuryBonusPct = null;
+    private float treasuryBonusPct = 0.0f;
     public TerritoryUpgrades upgrades;
     public final TerritoryResources resources;
     private final List<String> connections;
@@ -268,14 +268,8 @@ public class Territory implements Serializable {
         return this.owner;
     }
 
-    public Color getTreasuryColor() {
-        if (treasuryBonusPct == null) {
-            return Color.black;
-        }
-        treasuryBonusPct = Math.max(treasuryBonusPct, 0);
-        treasuryBonusPct = Math.min(treasuryBonusPct, 30);
-
-        return new Color((230 - treasuryBonusPct * 5) / 255, (40 + treasuryBonusPct * 7) / 255, (40 + treasuryBonusPct * 3) / 255);
+    public float getTreasuryPct() {
+        return this.treasuryBonusPct;
     }
 
     public TerritoryProductionType getPrimaryProduction() {

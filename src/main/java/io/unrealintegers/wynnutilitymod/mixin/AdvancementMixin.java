@@ -53,19 +53,19 @@ public abstract class AdvancementMixin {
 
         WynnUtilityMod.LOGGER.info("HQs: " + Wynncraft.getTerritories().values().stream().filter(t -> t.isHQ).count());
 
-        Set<String> connectedTerritories = Wynncraft.getTerritories()
+        Map<String, Integer> connectedTerritories = Wynncraft.getTerritories()
                 .values()
                 .stream()
                 .filter(t -> t.isHQ)
                 .map(t -> t.bfs((t1, d) -> t.getOwner().equals(t1.getOwner())))
-                .map(Map::keySet)
+                .map(Map::entrySet)
                 .flatMap(Set::stream)
-                .collect(Collectors.toUnmodifiableSet());
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         WynnUtilityMod.LOGGER.info("Connected: " + connectedTerritories.size());
 
         Wynncraft.getTerritories()
                 .values()
-                .forEach(t -> t.isConnectedToHQ = connectedTerritories.contains(t.getName()));
+                .forEach(t -> t.distanceToHQ = connectedTerritories.getOrDefault(t.getName(), -1));
     }
 }

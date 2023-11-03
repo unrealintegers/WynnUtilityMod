@@ -1,16 +1,18 @@
 package io.unrealintegers.wynnutilitymod.models;
 
 import io.unrealintegers.wynnutilitymod.WynnUtilityMod;
+import net.minecraft.util.Colors;
+import net.minecraft.util.Formatting;
 
 import java.awt.*;
 import java.util.Locale;
 
 public enum DefenceLevel {
-    VERY_LOW(new Color(0x55ffff), "-"),
-    LOW(new Color(0x55ff55), "L"),
-    MEDIUM(new Color(0xffff55), "M"),
-    HIGH(new Color(0xff5555), "H"),
-    VERY_HIGH(new Color(0xaa00aa), "V");
+    VERY_LOW(Formatting.AQUA, "-"),
+    LOW(Formatting.GREEN, "L"),
+    MEDIUM(Formatting.YELLOW, "M"),
+    HIGH(Formatting.RED, "H"),
+    VERY_HIGH(Formatting.DARK_PURPLE, "V");
 
     public static DefenceLevel parse(String level) {
         switch (level.toLowerCase(Locale.ROOT)) {
@@ -30,16 +32,16 @@ public enum DefenceLevel {
         }
     }
 
-    private final Color displayColor;
+    private final Formatting displayFormat;
     private final String displayText;
 
-    DefenceLevel(Color displayColor, String displayText) {
-        this.displayColor = displayColor;
+    DefenceLevel(Formatting displayFormat, String displayText) {
+        this.displayFormat = displayFormat;
         this.displayText = displayText;
     }
 
-    public Color getDisplayColor() {
-        return this.displayColor;
+    public String getFormat() {
+        return this.displayFormat.toString();
     }
 
     public String getDisplayText() {

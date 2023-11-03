@@ -20,10 +20,15 @@ import java.util.Map;
 
 public class Wynncraft {
     private static Map<String, Territory> territories = new HashMap<>();
+    private static boolean loaded = false;
     public static final IdentifiableResourceReloadListener listener = new SimpleSynchronousResourceReloadListener() {
 
         @Override
         public void reload(ResourceManager manager) {
+            // We don't want this to reload each time
+            if (loaded) return;
+            loaded = true;
+
             try {
                 int updated = Wynncraft.reloadTerritories(manager);
                 WynnUtilityMod.LOGGER.info("Loaded " + updated + " territories");

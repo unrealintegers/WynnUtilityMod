@@ -1,7 +1,6 @@
 package io.unrealintegers.wynnutilitymod.modules.eco;
 
 public enum EcoOverlayMode {
-    NAME_DEF,
     PRODUCTIONS,
     TOWER_LEVELS;
 

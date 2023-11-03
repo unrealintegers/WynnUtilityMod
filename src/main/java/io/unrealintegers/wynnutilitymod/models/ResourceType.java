@@ -1,16 +1,17 @@
 package io.unrealintegers.wynnutilitymod.models;
 
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.Arrays;
 
 public enum ResourceType {
-    EMERALDS(null, new Color(0x55ff55)),
-    ORE('\u24b7', new Color(65, 82, 82)),
-    WOOD('\u24b8', new Color(213, 157, 42)),
-    FISH('\u24c0', new Color(87, 234, 234)),
-    CROPS('\u24bf', new Color(227, 227, 72));
+    EMERALDS(null, Formatting.GREEN),
+    ORE('\u24b7', Formatting.GRAY),
+    WOOD('\u24b8', Formatting.GOLD),
+    FISH('\u24c0', Formatting.AQUA),
+    CROPS('\u24bf', Formatting.YELLOW);
 
     public static final ResourceType[] NON_EMERALD_TYPES = Arrays.copyOfRange(values(), 1, 5);
 
@@ -22,11 +23,15 @@ public enum ResourceType {
         }
     }
 
-    public final Character Symbol;
-    public final Color Color;
+    public final Character symbol;
+    private final Formatting format;
 
-    ResourceType(@Nullable Character symbol, Color color) {
-        this.Symbol = symbol;
-        this.Color = color;
+    ResourceType(@Nullable Character symbol, Formatting format) {
+        this.symbol = symbol;
+        this.format = format;
+    }
+
+    public String getFormat() {
+        return format.toString();
     }
 }
