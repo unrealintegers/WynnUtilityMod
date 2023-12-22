@@ -17,6 +17,7 @@ import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class XPManager {
             this.task = new UpdateXPTask(this);
             Scheduler.addTask(this.task);
             hasGuild = true;
-        } catch (IOException | InterruptedException | IllegalStateException | IndexOutOfBoundsException e) {
+        } catch (IOException | InterruptedException | IllegalStateException | IndexOutOfBoundsException | URISyntaxException e) {
             e.printStackTrace();
             hasGuild = false;
         }

@@ -10,9 +10,11 @@ import net.minecraft.client.MinecraftClient;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 import java.util.UUID;
 
 public class UpdateXPTask extends RecurringTask {
@@ -20,12 +22,12 @@ public class UpdateXPTask extends RecurringTask {
 
     private final XPManager xpManager;
     private final String guildName;
-    private final String url;
+    private final URI uri;
 
-    public UpdateXPTask(XPManager xpManager) throws IOException, InterruptedException {
+    private final UUID uuid = MinecraftClient.getInstance().getSession().getUuidOrNull();
+
+    public UpdateXPTask(XPManager xpManager) throws IOException, InterruptedException, URISyntaxException {
         super(INTERVAL, false);
-
-        UUID uuid = MinecraftClient.getInstance().getSession().getUuidOrNull();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.wynncraft.com/v2/player/" + uuid.toString() + "/stats"))
@@ -41,14 +43,22 @@ public class UpdateXPTask extends RecurringTask {
                     .getAsJsonObject()
                     .getAsJsonObject("guild")
                     .get("name")
-                    .getAsString()
-                    .replace(' ', '+');
+                    .getAsString();
         } catch (IOException | InterruptedException | IllegalStateException | IndexOutOfBoundsException e) {
             WynnUtilityMod.LOGGER.info("Failed to get guild name, XP functionality will be disabled.");
             throw e;
         }
 
-        this.url = "https://api.wynncraft.com/public_api.php?action=guildStats&command=" + guildName;
+        try {
+            this.uri = new URI("https",
+                    "api.wynncraft.com",
+                    "/v3/guild/" + guildName,
+                    "identifier=uuid",
+                    null);
+        } catch (URISyntaxException e) {
+            WynnUtilityMod.LOGGER.info("Failed to get guild name, XP functionality will be disabled.");
+            throw e;
+        }
         this.xpManager = xpManager;
 
         this.run();
@@ -56,27 +66,37 @@ public class UpdateXPTask extends RecurringTask {
 
     @Override
     protected void run() {
+        if (this.uuid == null) {
+            return;
+        }
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
+                .uri(uri)
                 .build();
 
-        JsonArray membersArray;
+        JsonObject members;
         try {
             var body = HttpClient.newHttpClient()
                     .send(request, HttpResponse.BodyHandlers.ofString())
                     .body();
-            membersArray = JsonParser.parseString(body).getAsJsonObject().getAsJsonArray("members");
+            members = JsonParser.parseString(body).getAsJsonObject().getAsJsonObject("members");
         } catch (IOException | InterruptedException | IllegalStateException e) {
             e.printStackTrace();
             return;
         }
 
-        for (JsonElement member : membersArray) {
-            JsonObject memberObject = member.getAsJsonObject();
-            if (memberObject.get("name").getAsString().equals(MinecraftClient.getInstance().getSession().getUsername())) {
-                long xp = memberObject.get("contributed").getAsLong();
-                xpManager.updateXP(xp);
-                return;
+        for (Map.Entry<String, JsonElement> rankEntry : members.entrySet()) {
+            if (rankEntry.getKey().equals("total")) continue;
+
+            JsonObject rankedMembers = rankEntry.getValue().getAsJsonObject();
+            for (Map.Entry<String, JsonElement> memberEntry : rankedMembers.entrySet()) {
+                JsonObject member = memberEntry.getValue().getAsJsonObject();
+                String uuid = member.get("uuid").getAsString();
+                if (uuid.equals(this.uuid.toString())) {
+                    int xp = member.get("contributed").getAsInt();
+                    this.xpManager.updateXP(xp);
+                    return;
+                }
             }
         }
     }
